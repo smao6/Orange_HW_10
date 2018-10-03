@@ -147,4 +147,8 @@ error=test-test.results$mean
 MAE=mean(abs(error))
 MAPE=mean(abs(error)/abs(test))
 
+file.dir <- "/Users/Garrett/Desktop/MSA Fall/Fall 1/Time Series/Data/"
+input.file1 <- "usairlines.sas7bdat"
+input.file2 <- "ar2.sas7bdat"
+
 

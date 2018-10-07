@@ -1,6 +1,8 @@
 library(readxl)
 library(lubridate)
 library(tidyverse)
+library(zoo)
+
 well <- read_excel("G-2866_T.xlsx", sheet = "Well")
 summary(well)
 hist(well$Corrected)

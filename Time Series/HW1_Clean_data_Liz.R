@@ -21,7 +21,7 @@ well_3<-well_2%>%
   summarise(avg=mean(depth))
 
 #find if there is any missing value
-seq=seq(
+datetime=seq(
   from=as.POSIXct("2007-10-1 1:00", tz="UTC"),
   to=as.POSIXct("2018-6-12 23:00", tz="UTC"),
   by="hour"

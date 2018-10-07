@@ -51,3 +51,19 @@ write.csv(well_4, file = "well_clean.csv",row.names=FALSE)
 write.csv(Train, file="well_train.csv", row.names = FALSE )
 write.csv(Test, file="well_test.csv", row.names = FALSE)
 
+
+
+##STL Decomposition:
+#Creation of Time Series Data Object
+well_stl <- ts(well_4$avg, frequency =8760)
+
+#Decomposition ...STL
+decomp_stl <- stl(well_stl, s.window = 7, na.action = na.approx)
+plot(decomp_stl)
+
+plot(well_stl, col = "grey", main = "Well - Trend/Cycle", xlab = "", ylab = "Well Avg.", lwd = 2)
+lines(decomp_stl$time.series[,2], col = "red", lwd = 2)
+
+seas_pass=well_stl-decomp_stl$time.series[,1]
+plot(well_stl, col = "grey", main = "Well - Seasonally Adjusted", xlab = "", ylab = "Well Avg.", lwd = 2)
+lines(seas_pass, col = "red", lwd = 2)

@@ -38,7 +38,7 @@ Train=well_4[1:93623,]
 Test=well_4[93624:93791,]
 
 # create a gg object using the well_3 dataframe with aesthetics: x = datetime and y = avg
-ggplot(well_3, aes(datetime, avg)) +
+ggplot(well_4, aes(datetime, avg)) +
   # draw a line plot using the above defined aesthetics
   geom_line(color = "black") +
   # drop some of the ugly R thematic elements for a simple look

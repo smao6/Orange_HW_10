@@ -26,6 +26,7 @@ datetime=seq(
   to=as.POSIXct("2018-6-12 23:00", tz="UTC"),
   by="hour"
 )  
+datetime<-as.data.frame(datetime)
 missing_hours=length(seq)-length(well_3$datetime) 
 #259
 #merge the actual datetime and well_3 

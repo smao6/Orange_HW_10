@@ -91,3 +91,16 @@ well_mstl_ts <- msts(well_4$avg, start=1, seasonal.periods = c(8760, 24))
 well_mstl_ts %>% mstl() %>%
   autoplot() + xlab("Hourly")
 #This suggests that we have yearly seasonality, but not necessarily daily seasonality
+
+
+#Modeling Deterministic Seasonality Using Fourier Function
+fit_well <- auto.arima(well_mstl_ts, seasonal=TRUE,
+                  xreg=fourier(well_mstl_ts, K=c(5,5)))
+summary(fit)
+
+fit_well %>%
+  forecast(xreg=fourier(well_mstl_ts, K=c(5,5), h=24*7)) %>%
+  autoplot(include=24*7) +
+  ylab("Well Depth") + xlab("Days")
+
+

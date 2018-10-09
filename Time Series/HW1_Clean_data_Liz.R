@@ -33,7 +33,10 @@ missing_hours=length(seq)-length(well_3$datetime)
 #259
 #merge the actual datetime and well_3 
 well_4 <- merge(datetime, well_3, by.all=c("datetime"), all.x = TRUE, all.y = TRUE )
-sum(is.na(well_4$avg)) 
+sum(is.na(well_4$avg))
+#impute the missing value
+well_4$avg[is.na(well_4$avg)] <- mean(well_4$avg, na.rm = T)
+sum(is.na(well_4$avg))
 #since we only have 259 missing observations, we can just leave it there and do
 #split into training and validation dataset (24*7=168 in validation set)
 Train=well_4[1:93623,]
@@ -57,8 +60,8 @@ write.csv(Test, file="well_test.csv", row.names = FALSE)
 
 ##STL Decomposition:
 #Creation of Time Series Data Object
-well_ts_train <- ts(Train$avg, frequency = 24*365)
-well_ts_test <- ts(Test$avg, frequency = 24*365)
+well_ts_train <- ts(Train$avg, frequency = 24*365.25)
+well_ts_test <- ts(Test$avg, frequency = 24*365.25)
 
 #Decomposition ...STL
 decomp_stl <- stl(well_stl, s.window = 7, na.action = na.approx)

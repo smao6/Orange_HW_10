@@ -1,0 +1,50 @@
+/*TIME SERIES 2 HOMEWORK 1*/
+
+/*IMPORT*/
+/*training*/
+proc import datafile='\\vmware-host\Shared Folders\Desktop\MSA Fall\Fall 2\Time Series 2\well_train.csv'
+out=train dbms=csv;
+run;
+/*test*/
+proc import datafile='\\vmware-host\Shared Folders\Desktop\MSA Fall\Fall 2\Time Series 2\well_test.csv'
+out=test dbms=csv;
+run;
+/*clean*/
+proc import datafile='\\vmware-host\Shared Folders\Desktop\MSA Fall\Fall 2\Time Series 2\well_clean.csv'
+out=clean dbms=csv;
+run;
+
+/*Fitting sine and cosine functions*/
+data train;
+	set train;
+	pi=constant("pi");/*Assigning a variable pi to have the value of 3.141592653...*/
+	s1=sin(2*pi*1*_n_/8766); /*Creating variables for sine and cosine functions*/
+	c1=cos(2*pi*1*_n_/8766); /*Season length is 8766 hours*/
+	s2=sin(2*pi*2*_n_/8766);
+	c2=cos(2*pi*2*_n_/8766);
+	s3=sin(2*pi*3*_n_/8766);
+	c3=cos(2*pi*3*_n_/8766);
+	s4=sin(2*pi*4*_n_/8766);
+	c4=cos(2*pi*4*_n_/8766);
+	s5=sin(2*pi*5*_n_/8766);
+	c5=cos(2*pi*5*_n_/8766);
+run;
+
+/*Fit Sine and Cosine functions to model seasonality*/
+proc arima data=train plot=all;
+	identify var=avg crosscorr=(s1 c1 s2 c2 s3 c3 /*s4 c4 s5 c5*/);
+	estimate /*p,q=?*/ input=(s1 c1 s2 c2 s3 c3 s4 c4 s5 c5); /*Fit these terms to this model*/
+	forecast back=168 lead=168 out=forecast;
+	title 'Sine and Cosine Functions';
+run;
+quit;
+/*Terrible white noise - what are some ways to better fit model?
+All forecasts are above the actual*/
+
+/* View actual values */
+proc print data=test;
+run;
+
+
+
+

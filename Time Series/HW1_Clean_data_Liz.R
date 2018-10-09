@@ -57,7 +57,8 @@ write.csv(Test, file="well_test.csv", row.names = FALSE)
 
 ##STL Decomposition:
 #Creation of Time Series Data Object
-well_stl <- ts(well_4$avg, frequency =8760)
+well_ts_train <- ts(Train$avg, frequency = 24*365)
+well_ts_test <- ts(Test$avg, frequency = 24*365)
 
 #Decomposition ...STL
 decomp_stl <- stl(well_stl, s.window = 7, na.action = na.approx)

@@ -58,18 +58,30 @@ write.csv(Test, file="well_test.csv", row.names = FALSE)
 
 
 
-##STL Decomposition:
-#Creation of Time Series Data Object
-well_ts_train <- ts(Train$avg, frequency = 24*365.25)
-well_ts_test <- ts(Test$avg, frequency = 24*365.25)
 
+
+
+## Only 3 years:
+Train3=well_4[67494:93791,]
+
+write.csv(Train3, file="Train3_R.csv", row.names = FALSE)
+
+##STL Decomposition:
+
+#Creation of Time Series Data Object
+
+#twice a year
+well_stl <- ts(Train3$avg, frequency =2191)
 #Decomposition ...STL
 decomp_stl <- stl(well_stl, s.window = 7, na.action = na.approx)
 plot(decomp_stl)
 
-plot(well_stl, col = "grey", main = "Well - Trend/Cycle", xlab = "", ylab = "Well Avg.", lwd = 2)
-lines(decomp_stl$time.series[,2], col = "red", lwd = 2)
 
 seas_pass=well_stl-decomp_stl$time.series[,1]
-plot(well_stl, col = "grey", main = "Well - Seasonally Adjusted", xlab = "", ylab = "Well Avg.", lwd = 2)
+plot(well_stl, col = "grey", main = "Corrected Well Height (ft) - Seasonally Adjusted", xlab = "", ylab = "Number of Passengers (Thousands)", lwd = 2)
 lines(seas_pass, col = "red", lwd = 2)
+
+
+
+
+

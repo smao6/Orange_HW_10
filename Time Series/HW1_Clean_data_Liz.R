@@ -2,6 +2,7 @@ library(readxl)
 library(lubridate)
 library(tidyverse)
 library(zoo)
+library(ggplot2)
 
 well <- read_excel("G-2866_T.xlsx", sheet = "Well")
 summary(well)

@@ -78,8 +78,43 @@ plot(decomp_stl)
 
 
 seas_pass=well_stl-decomp_stl$time.series[,1]
-plot(well_stl, col = "grey", main = "Corrected Well Height (ft) - Seasonally Adjusted", xlab = "", ylab = "Number of Passengers (Thousands)", lwd = 2)
+
+seas_pass2= well_stl-decomp_stl$time.series[,1] - decomp_stl$time.series[,2] 
+
+plot(well_stl, col = "black", main = "Corrected Well Height (ft) - Seasonally Adjusted", xlab = "", ylab = "Number of Passengers (Thousands)", lwd = 2)
 lines(seas_pass, col = "red", lwd = 2)
+
+
+general_well <- data.frame("well_stl" = as.numeric(well_stl),"seas_pass" = as.numeric(seas_pass),
+                           "seas_pass2" =  as.numeric(seas_pass2))
+general_well$index <- as.factor(seq.int(nrow(general_well)))
+
+
+##adding a box with legend:
+ggplot()+
+  geom_line(data = general_well, size = 1,aes(color = "Actual", x = index, y = well_stl, group=1)) +
+  geom_line(data =general_well , size = 1, aes(color="Predicted",x= index, y = seas_pass, group = 1))+
+  labs(x = "\nYears", y = "Well Height (ft)\n", title = "Corrected Well Water - Seasonally Adjusted\n") +
+  theme(plot.title = element_text(hjust = 0.5, size=28),text = element_text(size=16),
+        axis.title.x = element_text(size= 25), axis.title.y = element_text(size= 25)) + 
+  scale_x_discrete(breaks=seq(1,26298,8765),
+                   labels=c("1" = "2015","8766" = "2016","17531" = "2017","26296" = "2018")) + 
+  scale_colour_manual("Parameters",values=c("black","red"))
+
+
+
+
+
+ggplot()+
+  geom_line(data = general_well, size = 1,aes(color = "Actual", x = index, y = well_stl, group=1)) +
+  geom_line(data =general_well , size = 1, aes(color="Adjusted",x= index, y = seas_pass2, group = 1))+
+  labs(x = "\nYears", y = "Well Height (ft)\n", title = "Corrected Well Water - Seasonally + Trend Adjusted\n") +
+  theme(plot.title = element_text(hjust = 0.5, size=28),text = element_text(size=16),
+        axis.title.x = element_text(size= 25), axis.title.y = element_text(size= 25)) + 
+  scale_x_discrete(breaks=seq(1,26298,8765),
+                   labels=c("1" = "2015","8766" = "2016","17531" = "2017","26296" = "2018")) + 
+  scale_colour_manual("Parameters",values=c("black","red"))
+
 
 
 

@@ -36,36 +36,15 @@ missing_hours=length(seq)-length(well_3$datetime)
 well_4 <- merge(datetime, well_3, by.all=c("datetime"), all.x = TRUE, all.y = TRUE )
 sum(is.na(well_4$avg))
 #impute the missing value
-well_4$avg[is.na(well_4$avg)] <- mean(well_4$avg, na.rm = T)
+well_4$avg <- na.interp(well_4$avg)
 sum(is.na(well_4$avg))
 #since we only have 259 missing observations, we can just leave it there and do
-#split into training and validation dataset (24*7=168 in validation set)
-Train=well_4[1:93623,]
-Test=well_4[93624:93791,]
-
-# create a gg object using the well_3 dataframe with aesthetics: x = datetime and y = avg
-ggplot(well_4, aes(datetime, avg)) +
-  # draw a line plot using the above defined aesthetics
-  geom_line(color = "black") +
-  # drop some of the ugly R thematic elements for a simple look
-  theme_bw() +
-  # label the axes and add a title
-  labs(x = "Date And Time (in hours)", y = "Avg Depth of Well (in feet)", title = "Avg Depth of Well From 2007-2018")
-
-#clean well data in google dirve folder
-write.csv(well_4, file = "well_clean.csv",row.names=FALSE)
-write.csv(Train, file="well_train.csv", row.names = FALSE )
-write.csv(Test, file="well_test.csv", row.names = FALSE)
-
-
-
-
 
 
 ## Only 3 years:
 Train3=well_4[67494:93791,]
 
-write.csv(Train3, file="Train3_R.csv", row.names = FALSE)
+write.csv(Train3, file="Train3_R_new.csv", row.names = FALSE)
 
 ##STL Decomposition:
 

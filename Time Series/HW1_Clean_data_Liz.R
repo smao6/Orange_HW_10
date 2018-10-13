@@ -2,6 +2,7 @@ library(readxl)
 library(lubridate)
 library(tidyverse)
 library(zoo)
+library(forecast)
 library(ggplot2)
 
 well <- read_excel("G-2866_T.xlsx", sheet = "Well")
@@ -45,6 +46,21 @@ sum(is.na(well_4$avg))
 Train3=well_4[67494:93791,]
 
 write.csv(Train3, file="Train3_R_new.csv", row.names = FALSE)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ##STL Decomposition:
 

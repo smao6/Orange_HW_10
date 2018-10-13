@@ -130,7 +130,7 @@ rain_2<-  rain_2 %>%
 #group our data into hourly data and use the mean of Tide_ft
 rain_3<-rain_2%>%
   group_by(datetime)%>%
-  summarise(avg=mean(RAIN_FT))
+  summarise(avg=sum(RAIN_FT))
 
 #find if there is any missing value  - UPDATE THE TIME IF NEEDED
 datetime=seq(
@@ -149,7 +149,7 @@ print(missing_hours)
 
 well_4$avg_well <- as.numeric(well_4$avg)
 tide_4$avg_tide <- as.numeric(tide_4$avg)
-rain_3$avg_rain <- rain_3$avg
+rain_3$sum_rain <- rain_3$avg
 
 well_4<- well_4[,c(-2)]
 tide_4<- tide_4[,c(-2)]

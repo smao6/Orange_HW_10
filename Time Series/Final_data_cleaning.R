@@ -146,6 +146,12 @@ sum(is.na(tide_4$avg_tide))
 
 
 #data for 10 years
+#Create Date variable 
+well_merge$Date <- substr(well_merge$datetime, start = 1, stop=10)
+#Create Month variable
+well_merge$Month <- substr(well_merge$datetime, start = 6, stop=7)
+#Create Hour Variable
+well_merge$Hour <- substr(well_merge$datetime, start = 12, stop=13)
 well_merge <-inner_join(inner_join(well_4,rain_3,by = NULL, copy = FALSE),tide_4, by=NULL, copy = FALSE)
 write.csv(well_merge, file="merge_well.csv", row.names = FALSE)
 

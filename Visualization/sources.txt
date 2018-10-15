@@ -38,4 +38,11 @@ https://www.ryansleeper.com/how-to-add-a-button-to-a-tableau-dashboard/
 
 https://community.tableau.com/thread/159794
 
+https://www.thedataschool.co.uk/tom-pilgrem/navigate-dashboards-tableau/
+
+https://www.thedataschool.co.uk/niccolo-cirone/tableau-tip-week-wednesday-creating-dashboard-navigator-buttons/
+
+
+
+
 

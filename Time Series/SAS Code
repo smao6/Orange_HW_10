@@ -1,0 +1,418 @@
+/*TIME SERIES 2 HOMEWORK 2*/
+
+/*IMPORT*/
+/*Merged Data*/
+proc import datafile='\\vmware-host\Shared Folders\Desktop\MSA Fall\Fall 2\Time Series 2\correct_well_data.csv'
+	out=merge_well dbms=csv;
+run;
+/*Last 3 years*/
+proc import datafile='\\vmware-host\Shared Folders\Desktop\MSA Fall\Fall 2\Time Series 2\last_3_years.csv'
+	out=merged_3 dbms=csv;
+run;
+
+/*Explore data*/
+proc print data=merge_well (obs=100);
+run;
+
+/*Create Month Variable*/
+/*data merge_well;*/
+/*	set merge_well;*/
+/*	Month=substr(datetime);*/
+/*run;*/
+
+/*Group by well-depth month*/
+/*proc means data=merge_well;*/
+/*	var avg_well;*/
+/*run;*/
+
+/*Creating a dummy variable indicating high and low well depths per season*/
+/*data merge_well;*/
+/*	set merge_well;*/
+/*	if month='02' or month='03' or month='04' then depth_season=0;*/
+/*	else depth_season=1;*/
+/*run;*/
+
+/*Rain by month*/
+/*proc means data=merge_well;*/
+/*	class Month;*/
+/*	var sum_rain;*/
+/*run;*/
+/*Heaviest rain between April and October
+September rainiest month*/
+
+/*/*Create rain season Dummy variable*/*/
+/*data merge_well;*/
+/*	set merge_well;*/
+/*	if month='04' or month='05' or month='06' or month='07' */
+/*				or month='08' or month='09' or month = '10'*/
+/*	then rainy_season=1;*/
+/*	else rainy_season=0;*/
+/*run;*/
+/**/
+/*/*By hour*/*/
+/*proc means data=merge_well;*/
+/*	class Hour;*/
+/*	var avg_tide;*/
+/*run;*/
+/*All tide values the same - use this as place holder for other tide information*/
+
+/*Trying to see difference between months and well depths*/
+/*proc gchart data=merge_well;                                                                                                                                                                                         */
+/*   vbar month / sumvar=avg;                                                                                                        */
+/*run;                                                                                                                                    */
+/*quit;   */
+
+
+
+
+
+/*TRAINING*/
+/*Explore data*/;
+data merge_well;
+	set merge_well;
+	rain1=lag1(sum_rain);
+	rain2=lag2(sum_rain);
+	rain3=lag3(sum_rain);
+	rain4=lag4(sum_rain);
+	Adjust_rain=sum_rain*50;
+	log_rain=log(sum_rain);
+run;
+
+/*Last HW's Model*/
+proc arima data=merge_well plots=all;
+	identify var=avg_well(1,2191) nlag=40 stationarity=(adf=2);
+	estimate q=16 method=ML;
+	forecast lead=168 back=168 out=model;
+run;
+quit;
+/*Has lot of white noise present. Need to fit other variables.*/
+
+/*/*Finding the correct model*/*/
+/*proc arima data=merge_well;*/
+/*	identify var=avg_well(8760) crosscorr=(sum_rain);*/
+/*	estimate input=(sum_rain) p=4 q=2 method=ML;*/
+/*	forecast out=well_forecast_2;*/
+/*run;*/
+/*quit;*/
+
+/*See how rain follows well-depth*/;
+proc sgplot data=merge_well;
+	series x=datetime y=avg_well;
+	series x=datetime y=adjust_rain;
+	title;
+run;
+quit;
+/*Depth of well increases following rain pattern*/
+
+/*Understanding the lagged effect of rain*/
+data merge_well;
+	set merge_well;
+	obs+1;
+run;
+
+data subset1;
+	set merge_well;
+	where 580 le obs lt 748;
+	adjust_rain=50*sum_rain;
+run; 
+
+proc sgplot data=subset1;
+	series x=obs y=avg_well;
+	series x=obs y=adjust_rain;
+	
+run;
+
+/*Creating interventions and lag variables*/
+data merged_3;
+	set merged_3;
+	if sum_rain>0.05 then rain_int=1;
+	else rain_int=0;
+	rain1=lag1(sum_rain);
+	rain2=lag2(sum_rain);
+	rain3=lag3(sum_rain);
+	rain4=lag4(sum_rain);
+	rain5=lag5(sum_rain);
+	rain6=lag6(sum_rain);
+	rain7=lag7(sum_rain);
+	rain8=lag8(sum_rain);
+	rain9=lag9(sum_rain);
+	rain10=lag10(sum_rain);
+	rain11=lag11(sum_rain);
+	rain12=lag12(sum_rain);
+	rain13=lag13(sum_rain);
+	rain14=lag14(sum_rain);
+	rain15=lag15(sum_rain);
+	rain16=lag16(sum_rain);
+	rain17=lag17(sum_rain);
+	rain18=lag18(sum_rain);
+	rain19=lag19(sum_rain);
+	rain20=lag20(sum_rain);
+	rain21=lag21(sum_rain);
+	rain22=lag22(sum_rain);
+	rain23=lag23(sum_rain);
+	rain24=lag24(sum_rain);
+run; 
+
+/*Which terms will do?*/
+proc glmselect data=merged_3;
+	model avg_well = sum_rain rain1 rain2 rain3 rain4 rain5 rain6 rain7 rain8 rain9 rain10 rain11 rain12 rain13 rain14 rain15 rain16 rain17 rain18 rain19 rain20 rain21 rain22 rain23 rain24;
+run;
+
+/*Which p and q will do?*/
+proc arima data=merged_3;
+	identify var=avg_well(1) crosscorr=(rain5 rain7 rain10 rain12 rain14 rain17 rain19 rain21 rain22 rain24) minic scan esacf p=(0:60) q=(0:60);
+	estimate input=(rain5 rain7 rain10 rain12 rain14 rain17 rain19 rain21 rain22 rain24) method=ML;
+	*forecast lead=168 back=168 out=well_forecast_1;
+run;
+quit;
+
+/*Candidate model*/
+proc arima data=merged_3;
+	identify var=avg_well(1) crosscorr=(rain5 rain7 rain10 rain12 rain14 rain17 rain19 rain21 rain22 rain24);
+	estimate input=(rain5 rain7 rain10 rain12 rain14 rain17 rain19 rain21 rain22 rain24) p=1 q=3 method=ML;
+	forecast lead=168 back=168 out=well_forecast_1;
+run;
+quit;
+
+/*MAPE*/
+data well_forecast_1;
+	set well_forecast_1;
+	_TIMEID_ = _N_;
+run;
+
+data test;
+	set well_forecast_1;
+	if _TIMEID_>26130;
+	error = avg_well - FORECAST;
+	abs_error=abs(RESIDUAL);
+	abs_err_obs=abs_error/abs(avg_well);
+run;
+
+proc means data=test;
+	var abs_error abs_err_obs;
+run; 
+
+
+
+
+
+/*proc arima data=merged_3;*/
+/*	identify var=avg_well(1) crosscorr=(sum_rain);*/
+/*	estimate input=(sum_rain) p=2 q=2 method=ML;*/
+/*	forecast lead=168 back=168 out=well_forecast_1;*/
+/*run;*/
+/*quit;*/
+/*/*Lowers white noise marginally*/*/
+/*/*Consider using a shift*/*/
+/*proc arima data=merged_3;*/
+/*	identify var=avg_well(1) crosscorr=(sum_rain);*/
+/*	estimate input=(4$/(1) rain_int sum_rain) p=1 q=1 method=ML;*/
+/*	forecast lead=168 back=168 out=well_forecast_1;*/
+/*run;*/
+/*quit;*/
+/*/*Suggests that we have an AR(1) model*/*/
+/*/*Do not have white noise graph*/*/;
+
+/*data merged_3;*/
+/*	set merged_3;*/
+/*	if avg_well > 9.5 then well_int=1;*/
+/*	else well_int=0;*/
+/*run;*/
+/*/*Trying an intervention term*/*/
+/*proc arima data=merged_3;*/
+/*	identify var=avg_well(1) crosscorr=(well_int sum_rain rain6 rain9 rain11 rain12) nlag=30;*/
+/*	estimate input=(well_int sum_rain rain6 rain9 rain11 rain12 ) p=1 q=3 method=ML;*/
+/*	forecast lead=168 back=168 out=well_forecast_1;*/
+/*run;*/
+/*quit;*/
+/**/
+/*/*MAPE*/*/
+/*data well_forecast_1;*/
+/*	set well_forecast_1;*/
+/*	_TIMEID_ = _N_;*/
+/*run;*/
+/**/
+/*data test;*/
+/*	set well_forecast_1;*/
+/*	if _TIMEID_>26130;*/
+/*	error = avg_well - FORECAST;*/
+/*	abs_error=abs(RESIDUAL);*/
+/*	abs_err_obs=abs_error/abs(avg_well);*/
+/*run;*/
+/**/
+/*proc means data=test;*/
+/*	var abs_error abs_err_obs;*/
+/*run; */
+/*/*MAPE = 0.0.017*/*/
+/*/*About same white noise as above*/*/
+;
+
+/*This gives great white noise, but bad prediction*/
+proc arima data=merged_3;
+	identify var=avg_well(8760) crosscorr=(sum_rain ) nlag=50;
+	estimate input=(sum_rain ) p=4 q=1 method=ML;
+	forecast lead=168 back=168 out=well_forecast_2;
+run;
+quit;
+
+/*MAPE*/
+data well_forecast_2;
+	set well_forecast_2;
+	_TIMEID_ = _N_;
+run;
+
+data test2;
+	set well_forecast_2;
+	if _TIMEID_>26130;
+	error = avg_well - FORECAST;
+	abs_error=abs(RESIDUAL);
+	abs_err_obs=abs_error/abs(avg_well);
+run;
+
+proc means data=test2;
+	var abs_error abs_err_obs;
+run;
+
+proc glmselect data=merged_3;	
+	model avg_well=sum_rain rain1 rain2 rain3 rain4 avg_tide;
+run;
+quit;
+
+proc arima data=merged_3;
+	identify var=avg_well(8760) crosscorr=(rain4) nlag=50;
+	estimate input=(rain4) p=4 q=1 method=ML;
+	forecast lead=168 back=168 out=well_forecast_1;
+run;
+quit;
+/*Take differences of the x variable*/
+
+proc arima data=merge_well;
+	identify var=avg_well(8760) crosscorr=(sum_rain) nlag=50;
+	estimate input=(sum_rain) p=4 q=1 method=ML;
+	forecast lead=168 back=168 out=well_forecast_1;
+run;
+quit;
+
+proc arima data=merged_3;
+	identify var=sum_rain(4) stationarity=(adf=2);
+	estimate q=4 method=ML;
+run;
+
+proc arima data=merged_3;
+	identify var=sum_rain(4) nlag=50;
+	estimate q=4 method=ML;
+	forecast lead=168 out=rain_forecast;
+run;
+
+proc print data=rain_forecast (obs=10);
+run;
+
+data forec1; 
+	set rain_forecast;
+run; 
+
+data new_well;
+	set merged_3 forec1;
+run;
+
+proc print data=new_well (obs=100);
+run;
+
+/*With differenced x values*/
+proc arima data=merged_3;
+	identify var=avg_well(8760) crosscorr=(rain4 sum_rain);
+	estimate input=(rain4 sum_rain) p=4 q=1 method=ML;
+	forecast lead=168 back=168 out=forecast2;
+run;
+quit;
+
+proc arima data=merged_3;
+	identify var=avg_well(8760) crosscorr=(sum_rain(4));
+	estimate input=(4$/(1) sum_rain(4)) p=4 q=1 method=ML;
+	forecast lead=168 back=168 out=forecast2;
+run;
+quit;
+
+
+proc glmselect data=merged_3;
+	model avg_well=sum_rain rain1 rain2 rain3 rain4;
+run;
+quit;
+
+proc print data=merged_3 (obs=100);
+run;
+
+/*Inlcuding tide*/
+proc arima data=merged_3;
+	identify var=avg_well(8760) crosscorr=(sum_rain avg_tide);
+	estimate input=(sum_rain avg_tide) p=4 q=1 method=ML;
+	forecast out=well_forecast_1;
+run;
+quit;
+/*Not much better, but using more info*/
+
+proc arima data=merged_3;
+	identify var=avg_well(24, 8760) crosscorr=(sum_rain avg_tide);
+	estimate input=(sum_rain avg_tide) p=4 q=1 method=ML;
+	forecast out=well_forecast_1;
+run;
+quit;
+
+/*Checking residuals*/
+proc arima data=well_forecast_1;
+	identify var=residual stationarity=(adf=2 );
+run;
+quit;
+
+
+proc arima data=merge_well;
+	identify var=avg_well(1,2191) crosscorr=(sum_rain);
+	estimate input=(sum_rain) p=2 q=2 method=ML;
+	forecast out=well_forecast;
+run;
+quit;
+
+/*Using lag effects*/
+proc arima data=merged_3;
+	identify var=avg_well(8760) crosscorr=(sum_rain rain1 rain2 rain3 rain4);
+	estimate input=(sum_rain rain1 rain2 rain3 rain4) p=4 q=1 method=ML;
+	forecast out=well_forecast_1;
+run;
+quit;
+
+proc arima data=merged_3;
+	identify var=avg_well(8760) crosscorr=(sum_rain rain4 avg_tide);
+	estimate input=(sum_rain avg_tide rain4) p=4 q=1 method=ML;
+	forecast out=well_forecast_1;
+run;
+quit;
+
+proc arima data=merged_3;
+	identify var=avg_well(8760) nlag=50;
+	estimate p=4 q=1 method=ML;
+	forecast out=well_forecast_1;
+run;
+quit;
+
+
+/*Are the residuals stationary?*/
+proc arima data=well_forecast;
+	identify var=residual stationarity=(adf=2);
+run;
+quit;
+/*Residuals stationary*/ 
+
+proc arima data=merge_well;
+	identify var=avg_well(1,2191) crosscorr=(sum_rain) nlag=60;
+	estimate input=(sum_rain) q=24 method=ML;
+	forecast out=well_forecast;
+run;
+quit;
+
+proc arima data=merged_3;
+	identify var=avg_well(2191) crosscorr=(sum_rain) nlag=60;
+	estimate input=(sum_rain) p=10 q=10 method=ML;
+	forecast out=well_forecast;
+run;
+quit;
+

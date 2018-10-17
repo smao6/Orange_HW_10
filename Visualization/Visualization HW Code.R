@@ -1,0 +1,564 @@
+##################################
+####     Visualization HW     ####
+##################################
+
+library(readxl)
+library(lubridate)
+library(tidyverse)
+library(Hmisc)
+library(zoo)
+library(broom)
+library(ggfortify)
+library(uroot)
+library(lmtest)
+library(forecast)
+library(dplyr)
+library(ggplot2)
+library(xlsx)
+
+##################################
+##  Well G-1260_T cleaning  ######
+##################################
+
+# Saving File Locations and Uploading SAS File #
+setwd('/Users/groves/Documents/Morgan/IAA/Fall 2/Visualization/Well Data/')
+file.dir <- "/Users/groves/Documents/Morgan/IAA/Fall 2/Visualization/Well Data/"
+input.fileG1260  <- "G-1260_T.xlsx"
+
+#read in sheet from file
+well_G1260 <- read_excel("G-1260_T.xlsx", sheet = "Well")
+
+well2_G1260 <- well_G1260 %>% 
+  # create a new variable which is an integer for the hour of each time
+  mutate(time_2 = hour(time)) %>% 
+  # merge the data and newly created datetime variables into a variable called datetime
+  unite(datetime, date, time_2, sep = " ", remove = FALSE) %>%
+  # convert the character datetime variable to an R recognized datetime format
+  mutate(datetime = ymd_h(datetime)) %>%
+  # select only the new datetime variable and rename the Corrected variable to depth
+  select(datetime, depth = Corrected)
+
+#group our data into hourly data and use the mean of depth
+well3_G1260<-well2_G1260%>%
+  group_by(datetime)%>%
+  summarise(avg_well=mean(depth))
+
+#find if there is any missing value
+datetime=seq(
+  from=as.POSIXct("2007-10-1 1:00", tz="UTC"),
+  to=as.POSIXct("2018-6-12 23:00", tz="UTC"),
+  by="hour"
+)
+missing_hours=length(datetime)-length(well3_G1260$datetime) 
+datetime<-as.data.frame(datetime)
+missing_hours #508
+
+#merge the actual datetime and well3_G1260 and impute the missing values
+well4_G1260 <- merge(datetime, well3_G1260, by.all=c("datetime"), all.x = TRUE, all.y = TRUE )
+sum(is.na(well4_G1260$avg_well))
+#impute the missing value
+well4_G1260$avg_well <- na.interp(well4_G1260$avg)
+sum(is.na(well4_G1260$avg_well))
+
+well4_G1260$well <- "G-1260_T"
+well4_G1260 <-as.data.frame(well4_G1260)
+
+##################################
+###    Well G-3549 cleaning    ###
+##################################
+
+input.fileG3549  <- "G-3549.xlsx"
+
+#read in sheet from file
+well_G3549 <- read_excel("G-3549.xlsx", sheet = "Well")
+
+well2_G3549 <- well_G3549 %>% 
+  # create a new variable which is an integer for the hour of each time
+  mutate(time_2 = hour(time)) %>% 
+  # merge the data and newly created datetime variables into a variable called datetime
+  unite(datetime, date, time_2, sep = " ", remove = FALSE) %>%
+  # convert the character datetime variable to an R recognized datetime format
+  mutate(datetime = ymd_h(datetime)) %>%
+  # select only the new datetime variable and rename the Corrected variable to depth
+  select(datetime, depth = Corrected)
+
+#group our data into hourly data and use the mean of depth
+well3_G3549<-well2_G3549%>%
+  group_by(datetime)%>%
+  summarise(avg_well=mean(depth))
+
+#find if there is any missing value
+datetime=seq(
+  from=as.POSIXct("2007-10-1 1:00", tz="UTC"),
+  to=as.POSIXct("2018-6-12 23:00", tz="UTC"),
+  by="hour"
+)
+missing_hours=length(datetime)-length(well3_G3549$datetime) 
+datetime<-as.data.frame(datetime)
+missing_hours #857
+
+#merge the actual datetime and well3_G3549 and impute the missing values
+well4_G3549 <- merge(datetime, well3_G3549, by.all=c("datetime"), all.x = TRUE, all.y = TRUE )
+sum(is.na(well4_G3549$avg_well))
+#impute the missing value
+well4_G3549$avg_well <- na.interp(well4_G3549$avg)
+sum(is.na(well4_G3549$avg_well))
+
+well4_G3549$well <- "G-3549"
+well4_G3549 <-as.data.frame(well4_G3549)
+
+##################################
+###    Well G561_T cleaning    ###
+##################################
+
+input.fileG561 <- "G-561_T.xlsx"
+
+#read in sheet from file
+well_G561 <- read_excel("G-561_T.xlsx", sheet = "Well")
+
+well2_G561 <- well_G561 %>% 
+  # create a new variable which is an integer for the hour of each time
+  mutate(time_2 = hour(time)) %>% 
+  # merge the data and newly created datetime variables into a variable called datetime
+  unite(datetime, date, time_2, sep = " ", remove = FALSE) %>%
+  # convert the character datetime variable to an R recognized datetime format
+  mutate(datetime = ymd_h(datetime)) %>%
+  # select only the new datetime variable and rename the Corrected variable to depth
+  select(datetime, depth = Corrected)
+
+#group our data into hourly data and use the mean of depth
+well3_G561<-well2_G561%>%
+  group_by(datetime)%>%
+  summarise(avg_well=mean(depth))
+
+#find if there is any missing value
+datetime=seq(
+  from=as.POSIXct("2007-05-1 0:00", tz="UTC"),
+  to=as.POSIXct("2018-6-12 23:00", tz="UTC"),
+  by="hour"
+)
+missing_hours=length(datetime)-length(well3_G561$datetime) 
+datetime<-as.data.frame(datetime)
+missing_hours #4022
+
+#merge the actual datetime and well3_G561 and impute the missing values
+well4_G561 <- merge(datetime, well3_G561, by.all=c("datetime"), all.x = TRUE, all.y = TRUE )
+sum(is.na(well4_G561$avg_well))
+#impute the missing value
+well4_G561$avg_well <- na.interp(well4_G561$avg)
+sum(is.na(well4_G561$avg_well))
+
+well4_G561$well <- "G-561_T"
+well4_G561 <-as.data.frame(well4_G561)
+
+##################################
+###   Well G-2147 cleaning     ###
+##################################
+
+input.fileG2147 <- "G-2147_T.xlsx"
+
+#read in sheet from file
+well_G2147 <- read_excel("G-2147_T.xlsx", sheet = "Well")
+
+well2_G2147 <- well_G2147 %>% 
+  # create a new variable which is an integer for the hour of each time
+  mutate(time_2 = hour(time)) %>% 
+  # merge the data and newly created datetime variables into a variable called datetime
+  unite(datetime, date, time_2, sep = " ", remove = FALSE) %>%
+  # convert the character datetime variable to an R recognized datetime format
+  mutate(datetime = ymd_h(datetime)) %>%
+  # select only the new datetime variable and rename the Corrected variable to depth
+  select(datetime, depth = Corrected)
+
+#group our data into hourly data and use the mean of depth
+well3_G2147 <-well2_G2147%>%
+  group_by(datetime)%>%
+  summarise(avg_well=mean(depth))
+
+#find if there is any missing value
+datetime=seq(
+  from=as.POSIXct("2007-10-10 0:00", tz="UTC"),
+  to=as.POSIXct("2018-6-12 23:00", tz="UTC"),
+  by="hour"
+)
+missing_hours=length(datetime)-length(well3_G2147$datetime) 
+datetime<-as.data.frame(datetime)
+missing_hours #970
+
+#merge the actual datetime and well3_G2147 and impute the missing values
+well4_G2147 <- merge(datetime, well3_G2147, by.all=c("datetime"), all.x = TRUE, all.y = TRUE )
+sum(is.na(well4_G2147$avg_well))
+#impute the missing value
+well4_G2147$avg_well <- na.interp(well4_G2147$avg)
+sum(is.na(well4_G2147$avg_well))
+
+well4_G2147$well <- "G-2147_T"
+well4_G2147 <-as.data.frame(well4_G2147)
+
+##################################
+###    Well G-2866 cleaning    ###
+##################################
+
+input.fileG2866 <- "G-2866_T.xlsx"
+
+#read in sheet from file
+well_G2866 <- read_excel("G-2866_T.xlsx", sheet = "Well")
+
+well2_G2866 <- well_G2866 %>% 
+  # create a new variable which is an integer for the hour of each time
+  mutate(time_2 = hour(time)) %>% 
+  # merge the data and newly created datetime variables into a variable called datetime
+  unite(datetime, date, time_2, sep = " ", remove = FALSE) %>%
+  # convert the character datetime variable to an R recognized datetime format
+  mutate(datetime = ymd_h(datetime)) %>%
+  # select only the new datetime variable and rename the Corrected variable to depth
+  select(datetime, depth = Corrected)
+
+#group our data into hourly data and use the mean of depth
+well3_G2866 <-well2_G2866%>%
+  group_by(datetime)%>%
+  summarise(avg_well=mean(depth))
+
+#find if there is any missing value
+datetime=seq(
+  from=as.POSIXct("2007-10-1 1:00", tz="UTC"),
+  to=as.POSIXct("2018-6-12 23:00", tz="UTC"),
+  by="hour"
+)
+missing_hours=length(datetime)-length(well3_G2866$datetime) 
+datetime<-as.data.frame(datetime)
+missing_hours #259
+
+#merge the actual datetime and well3_G2866 and impute the missing values
+well4_G2866 <- merge(datetime, well3_G2866, by.all=c("datetime"), all.x = TRUE, all.y = TRUE )
+sum(is.na(well4_G2866$avg_well))
+#impute the missing value
+well4_G2866$avg_well <- na.interp(well4_G2866$avg)
+sum(is.na(well4_G2866$avg_well))
+
+well4_G2866$well <- "G-2866_T"
+well4_G2866 <-as.data.frame(well4_G2866)
+
+##################################
+####    Well F-45 cleaning    ####
+##################################
+
+input.fileF45 <- "F-45.xlsx"
+
+#read in sheet from file
+well_F45 <- read_excel("F-45.xlsx", sheet = "Well")
+
+well2_F45 <- well_F45 %>% 
+  # create a new variable which is an integer for the hour of each time
+  mutate(time_2 = hour(time)) %>% 
+  # merge the data and newly created datetime variables into a variable called datetime
+  unite(datetime, date, time_2, sep = " ", remove = FALSE) %>%
+  # convert the character datetime variable to an R recognized datetime format
+  mutate(datetime = ymd_h(datetime)) %>%
+  # select only the new datetime variable and rename the Corrected variable to depth
+  select(datetime, depth = Corrected)
+
+#group our data into hourly data and use the mean of depth
+well3_F45 <-well2_F45%>%
+  group_by(datetime)%>%
+  summarise(avg_well=mean(depth))
+
+#find if there is any missing value
+datetime=seq(
+  from=as.POSIXct("2007-10-1 1:00", tz="UTC"),
+  to=as.POSIXct("2018-6-12 23:00", tz="UTC"),
+  by="hour"
+)
+missing_hours=length(datetime)-length(well3_F45$datetime) 
+datetime<-as.data.frame(datetime)
+missing_hours #4712
+
+#merge the actual datetime and well3_F45 and impute the missing values
+well4_F45<- merge(datetime, well3_F45, by.all=c("datetime"), all.x = TRUE, all.y = TRUE )
+sum(is.na(well4_F45$avg_well))
+#impute the missing value
+well4_F45$avg_well <- na.interp(well4_F45$avg)
+sum(is.na(well4_F45$avg_well))
+
+well4_F45$well <- "F-45"
+well4_F45 <-as.data.frame(well4_F45)
+
+##################################
+####    Well F-179 cleaning   ####
+##################################
+
+input.fileF179 <- "F-179.xlsx"
+
+#read in sheet from file
+well_F179 <- read_excel("F-179.xlsx", sheet = "Well")
+
+well2_F179 <- well_F179 %>% 
+  # create a new variable which is an integer for the hour of each time
+  mutate(time_2 = hour(time)) %>% 
+  # merge the data and newly created datetime variables into a variable called datetime
+  unite(datetime, date, time_2, sep = " ", remove = FALSE) %>%
+  # convert the character datetime variable to an R recognized datetime format
+  mutate(datetime = ymd_h(datetime)) %>%
+  # select only the new datetime variable and rename the Corrected variable to depth
+  select(datetime, depth = Corrected)
+
+#group our data into hourly data and use the mean of depth
+well3_F179 <-well2_F179%>%
+  group_by(datetime)%>%
+  summarise(avg_well=mean(depth))
+
+#find if there is any missing value
+datetime=seq(
+  from=as.POSIXct("2007-10-1 1:00", tz="UTC"),
+  to=as.POSIXct("2018-6-4 10:00", tz="UTC"),
+  by="hour"
+)
+missing_hours=length(datetime)-length(well3_F179$datetime) 
+datetime<-as.data.frame(datetime)
+missing_hours #955
+
+#merge the actual datetime and well3_F179 and impute the missing values
+well4_F179<- merge(datetime, well3_F179, by.all=c("datetime"), all.x = TRUE, all.y = TRUE )
+sum(is.na(well4_F179$avg_well))
+#impute the missing value
+well4_F179$avg_well <- na.interp(well4_F179$avg)
+sum(is.na(well4_F179$avg_well))
+
+well4_F179$well <- "F-179"
+well4_F179 <-as.data.frame(well4_F179)
+
+##################################
+####    Well F-319 cleaning   ####
+##################################
+
+input.fileF319 <- "F-319.xlsx"
+
+#read in sheet from file
+well_F319 <- read_excel("F-319.xlsx", sheet = "Well")
+
+well2_F319 <- well_F319 %>% 
+  # create a new variable which is an integer for the hour of each time
+  mutate(time_2 = hour(time)) %>% 
+  # merge the data and newly created datetime variables into a variable called datetime
+  unite(datetime, date, time_2, sep = " ", remove = FALSE) %>%
+  # convert the character datetime variable to an R recognized datetime format
+  mutate(datetime = ymd_h(datetime)) %>%
+  # select only the new datetime variable and rename the Corrected variable to depth
+  select(datetime, depth = Corrected)
+
+#group our data into hourly data and use the mean of depth
+well3_F319 <-well2_F319%>%
+  group_by(datetime)%>%
+  summarise(avg_well=mean(depth))
+
+#find if there is any missing value
+datetime=seq(
+  from=as.POSIXct("2007-10-1 1:00", tz="UTC"),
+  to=as.POSIXct("2018-6-4 11:00", tz="UTC"),
+  by="hour"
+)
+missing_hours=length(datetime)-length(well3_F319$datetime) 
+datetime<-as.data.frame(datetime)
+missing_hours #2022
+
+#merge the actual datetime and well3_F319 and impute the missing values
+well4_F319<- merge(datetime, well3_F319, by.all=c("datetime"), all.x = TRUE, all.y = TRUE )
+sum(is.na(well4_F319$avg_well))
+#impute the missing value
+well4_F319$avg_well <- na.interp(well4_F319$avg)
+sum(is.na(well4_F319$avg_well))
+
+well4_F319$well <- "F-319"
+well4_F319 <-as.data.frame(well4_F319)
+
+##################################
+####   Well G-580A cleaning   ####
+##################################
+
+input.fileG580A <- "G-580A.xlsx"
+
+#read in sheet from file
+well_G580A <- read_excel("G-580A.xlsx", sheet = "Well")
+
+well2_G580A <- well_G580A %>% 
+  # create a new variable which is an integer for the hour of each time
+  mutate(time_2 = hour(time)) %>% 
+  # merge the data and newly created datetime variables into a variable called datetime
+  unite(datetime, date, time_2, sep = " ", remove = FALSE) %>%
+  # convert the character datetime variable to an R recognized datetime format
+  mutate(datetime = ymd_h(datetime)) %>%
+  # select only the new datetime variable and rename the Corrected variable to depth
+  select(datetime, depth = Corrected)
+
+#group our data into hourly data and use the mean of depth
+well3_G580A <-well2_G580A%>%
+  group_by(datetime)%>%
+  summarise(avg_well=mean(depth))
+
+#find if there is any missing value
+datetime=seq(
+  from=as.POSIXct("2007-10-1 0:00", tz="UTC"),
+  to=as.POSIXct("2018-6-12 23:00", tz="UTC"),
+  by="hour"
+)
+missing_hours=length(datetime)-length(well3_G580A$datetime) 
+datetime<-as.data.frame(datetime)
+missing_hours #4484
+
+#merge the actual datetime and well3_G580A and impute the missing values
+well4_G580A<- merge(datetime, well3_G580A, by.all=c("datetime"), all.x = TRUE, all.y = TRUE )
+sum(is.na(well4_G580A$avg_well))
+#impute the missing value
+well4_G580A$avg_well <- na.interp(well4_G580A$avg)
+sum(is.na(well4_G580A$avg_well))
+
+well4_G580A$well <- "G-580A"
+well4_G580A <-as.data.frame(well4_G580A)
+
+##################################
+####   Well G-852 cleaning    ####
+##################################
+
+input.fileG852 <- "G-852.xlsx"
+
+#read in sheet from file
+well_G852 <- read_excel("G-852.xlsx", sheet = "Well")
+
+well2_G852 <- well_G852 %>% 
+  # create a new variable which is an integer for the hour of each time
+  mutate(time_2 = hour(Time)) %>% 
+  # merge the data and newly created datetime variables into a variable called datetime
+  unite(datetime, Date, time_2, sep = " ", remove = FALSE) %>%
+  # convert the character datetime variable to an R recognized datetime format
+  mutate(datetime = ymd_h(datetime)) %>%
+  # select only the new datetime variable and rename the Corrected variable to depth
+  select(datetime, depth = Corrected)
+
+#group our data into hourly data and use the mean of depth
+well3_G852 <-well2_G852%>%
+  group_by(datetime)%>%
+  summarise(avg_well=mean(depth))
+
+#find if there is any missing value
+datetime=seq(
+  from=as.POSIXct("2000-07-28 8:00", tz="UTC"),
+  to=as.POSIXct("2018-07-06 23:00", tz="UTC"),
+  by="hour"
+)
+missing_hours=length(datetime)-length(well3_G852$datetime) 
+datetime<-as.data.frame(datetime)
+missing_hours #66489
+
+#merge the actual datetime and well3_G580A and impute the missing values
+well4_G852<- merge(datetime, well3_G852, by.all=c("datetime"), all.x = TRUE, all.y = TRUE )
+sum(is.na(well4_G852$avg_well))
+#impute the missing value
+well4_G852$avg_well <- na.interp(well4_G852$avg)
+sum(is.na(well4_G852$avg_well))
+
+well4_G852$well <- "G-852"
+well4_G852 <-as.data.frame(well4_G852)
+
+##################################
+####   Well G-860 cleaning   ####
+##################################
+
+input.fileG860 <- "G-860.xlsx"
+
+#read in sheet from file
+well_G860 <- read_excel("G-860.xlsx", sheet = "Well")
+
+well2_G860 <- well_G860 %>% 
+  # create a new variable which is an integer for the hour of each time
+  mutate(time_2 = hour(time)) %>% 
+  # merge the data and newly created datetime variables into a variable called datetime
+  unite(datetime, date, time_2, sep = " ", remove = FALSE) %>%
+  # convert the character datetime variable to an R recognized datetime format
+  mutate(datetime = ymd_h(datetime)) %>%
+  # select only the new datetime variable and rename the Corrected variable to depth
+  select(datetime, depth = Corrected)
+
+#group our data into hourly data and use the mean of depth
+well3_G860 <-well2_G860%>%
+  group_by(datetime)%>%
+  summarise(avg_well=mean(depth))
+
+#find if there is any missing value
+datetime=seq(
+  from=as.POSIXct("2005-10-10 0:00", tz="UTC"),
+  to=as.POSIXct("2018-6-30 19:00", tz="UTC"),
+  by="hour"
+)
+missing_hours=length(datetime)-length(well3_G860$datetime) 
+datetime<-as.data.frame(datetime)
+missing_hours #21148
+
+#merge the actual datetime and well3_G-860 and impute the missing values
+well4_G860<- merge(datetime, well3_G860, by.all=c("datetime"), all.x = TRUE, all.y = TRUE )
+sum(is.na(well4_G860$avg_well))
+#impute the missing value
+well4_G860$avg_well <- na.interp(well4_G860$avg)
+sum(is.na(well4_G860$avg_well))
+
+well4_G860$well <- "G-860"
+well4_G860 <-as.data.frame(well4_G860)
+
+##################################
+##   Well G-1220-T cleaning   ####
+##################################
+
+input.fileG1220T<- "G-1220_T.xlsx"
+
+#read in sheet from file
+well_G1220T <- read_excel("G-1220_T.xlsx", sheet = "Well")
+
+well2_G1220T <- well_G1220T %>% 
+  # create a new variable which is an integer for the hour of each time
+  mutate(time_2 = hour(time)) %>% 
+  # merge the data and newly created datetime variables into a variable called datetime
+  unite(datetime, date, time_2, sep = " ", remove = FALSE) %>%
+  # convert the character datetime variable to an R recognized datetime format
+  mutate(datetime = ymd_h(datetime)) %>%
+  # select only the new datetime variable and rename the Corrected variable to depth
+  select(datetime, depth = Corrected)
+
+#group our data into hourly data and use the mean of depth
+well3_G1220T <-well2_G1220T%>%
+  group_by(datetime)%>%
+  summarise(avg_well=mean(depth))
+
+#find if there is any missing value
+datetime=seq(
+  from=as.POSIXct("2007-10-1 1:00", tz="UTC"),
+  to=as.POSIXct("2018-6-12 23:00", tz="UTC"),
+  by="hour"
+)
+missing_hours=length(datetime)-length(well3_G1220T$datetime) 
+datetime<-as.data.frame(datetime)
+missing_hours #17694
+
+#merge the actual datetime and well3_G1220T and impute the missing values
+well4_G1220T<- merge(datetime, well3_G1220T, by.all=c("datetime"), all.x = TRUE, all.y = TRUE )
+sum(is.na(well4_G1220T$avg_well))
+#impute the missing value
+well4_G1220T$avg_well <- na.interp(well4_G1220T$avg)
+sum(is.na(well4_G1220T$avg_well))
+
+well4_G1220T$well <- "G-1220_T"
+well4_G1220T <-as.data.frame(well4_G1220T)
+
+##################################
+#####    Append Data Set    ######
+##################################
+
+all_wells <- append(well4_F179, well4_F319)
+all_wells <- append(all_wells, well4_F45)
+all_wells <- append(all_wells, well4_G1220T)
+all_wells <- append(all_wells, well4_G1260)
+all_wells <- append(all_wells, well4_G2147)
+all_wells <- append(all_wells, well4_G2866)
+all_wells <- append(all_wells, well4_G3549)
+all_wells <- append(all_wells, well4_G561)
+all_wells <- append(all_wells, well4_G580A)
+all_wells <- append(all_wells, well4_G852)
+all_wells <- append(all_wells, well4_G860)

@@ -1,0 +1,91 @@
+library(readxl)
+library(lubridate)
+library(tidyverse)
+library(Hmisc)
+library(zoo)
+library(broom)
+library(ggfortify)
+library(uroot)
+library(lmtest)
+library(forecast)
+library(dplyr)
+library(ggplot2)
+
+##########################################################
+####### F-45
+##########################################################
+
+
+F_45_rain <- read_excel("/Users/Garrett/Desktop/MSA Fall/Fall 2/Visualization/Well Data/F-45.xlsx", sheet = "Rain")
+summary(F_45_rain)
+View(F_45_rain)
+
+
+str(rain)
+dim(rain)
+
+#Create date, time, and datetime variables
+F_45_rain$date <- substr(F_45_rain$Date, 1,10)
+F_45_rain$time  <- substr(F_45_rain$Date, 12,19)
+F_45_rain$datetime <- substr(F_45_rain$Date, 1, 13)
+# rain <- rain[,c(-1)]
+# rain<- rain[,c(2,3,1)]
+# str(tide)
+# str(rain)
+
+F_45_rain$datetime <- paste(F_45_rain$datetime, ":00:00", sep="")
+
+View(F_45_rain)
+
+F_45_rain_2 <- F_45_rain %>%
+  group_by(datetime)%>%
+  summarise(sum_rain=sum(F_45_rain$RAIN_FT))
+
+View(F_45_rain_2)
+
+sum(is.na(F_45_rain))
+# 0 missing values
+
+sum(is.na(F_45_rain_2))
+#0 missing values 
+
+#Still need to subset
+
+################################################
+######### F-179
+
+F_179_rain <- read_excel("/Users/Garrett/Desktop/MSA Fall/Fall 2/Visualization/Well Data/F-179.xlsx", sheet = "Rain")
+summary(F_179_rain)
+View(F_179_rain)
+
+
+str(rain)
+dim(rain)
+
+#Create date, time, and datetime variables
+F_179_rain$date <- substr(F_179_rain$Date, 1,10)
+F_179_rain$time  <- substr(F_179_rain$Date, 12,19)
+F_179_rain$datetime <- substr(F_179_rain$Date, 1, 13)
+# rain <- rain[,c(-1)]
+# rain<- rain[,c(2,3,1)]
+# str(tide)
+# str(rain)
+
+F_179_rain$datetime <- paste(F_179_rain$datetime, ":00:00", sep="")
+
+View(F_179_rain)
+
+F_179_rain_2 <- F_179_rain %>%
+  group_by(datetime)%>%
+  summarise(sum_rain=sum(F_179_rain$RAIN_FT))
+
+View(F_179_rain_2)
+
+sum(is.na(F_179_rain))
+# 0 missing values
+
+sum(is.na(F_179_rain_2))
+#0 missing values 
+
+#Still need to subset
+  

@@ -553,7 +553,9 @@ well4_G1220T <-as.data.frame(well4_G1220T)
 ##################################
 
 all_wells <- smartbind(well4_F179, well4_F319, well4_F45, well4_G1220T, well4_G1260, well4_G2147, well4_G2866, well4_G3549, well4_G561, well4_G580A, well4_G852, well4_G860)
-View(all_wells)
+all_wells$datetime <- as.POSIXlt(all_wells$datetime, '%Y-%m-%d %H:%M')
+all_wells$avg_well <- as.numeric(all_wells$avg_well)
+str(all_wells)
 
 ##################################
 #####      Export to CSV    ######

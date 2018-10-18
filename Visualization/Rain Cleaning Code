@@ -1,0 +1,298 @@
+library(readxl)
+library(lubridate)
+library(tidyverse)
+library(Hmisc)
+library(zoo)
+library(broom)
+library(ggfortify)
+library(uroot)
+library(lmtest)
+library(forecast)
+library(dplyr)
+library(ggplot2)
+library(gtools)
+
+setwd('/Users/groves/Documents/Morgan/IAA/Fall 2/Visualization/Well Data/')
+file.dir <- "/Users/groves/Documents/Morgan/IAA/Fall 2/Visualization/Well Data/"
+
+#######  F-179  #########
+input.fileF179  <- "F-179.xlsx"
+rain_F179 <- read_excel("F-179.xlsx", sheet = "Rain")
+
+#Create date, time, and datetime variables
+rain_F179$date <- substr(rain_F179$Date, 1,10)
+rain_F179$time  <- substr(rain_F179$Date, 12,19)
+rain_F179$datetime <- substr(rain_F179$Date, 1, 13)
+
+rain_F179$datetime <- paste(rain_F179$datetime, ":00:00", sep="")
+
+rain2_F179 <- rain_F179 %>%
+  group_by(datetime)%>%
+  summarise(sum_rain=sum(rain_F179$RAIN_FT))
+
+sum(is.na(rain_F179))
+# 0 missing values
+
+sum(is.na(rain2_F179))
+#0 missing values 
+
+rain2_F179$well <- "F-179"
+
+#######  F-45  #########
+input.fileF45  <- "F-45.xlsx"
+rain_F45 <- read_excel("F-45.xlsx", sheet = "Rain")
+
+#Create date, time, and datetime variables
+rain_F45$date <- substr(rain_F45$Date, 1,10)
+rain_F45$time  <- substr(rain_F45$Date, 12,19)
+rain_F45$datetime <- substr(rain_F45$Date, 1, 13)
+
+rain_F45$datetime <- paste(rain_F45$datetime, ":00:00", sep="")
+
+rain2_F45 <- rain_F45 %>%
+  group_by(datetime)%>%
+  summarise(sum_rain=sum(rain_F45$RAIN_FT))
+
+sum(is.na(rain_F45))
+# 0 missing values
+
+sum(is.na(rain2_F45))
+#0 missing values 
+
+rain2_F45$well <- "F-45"
+
+#######  F-319  #########
+input.fileF319  <- "F-319.xlsx"
+rain_F319 <- read_excel("F-319.xlsx", sheet = "Rain")
+
+#Create date, time, and datetime variables
+rain_F319$date <- substr(rain_F319$Date, 1,10)
+rain_F319$time  <- substr(rain_F319$Date, 12,19)
+rain_F319$datetime <- substr(rain_F319$Date, 1, 13)
+
+rain_F319$datetime <- paste(rain_F319$datetime, ":00:00", sep="")
+
+rain2_F319 <- rain_F319 %>%
+  group_by(datetime)%>%
+  summarise(sum_rain=sum(rain_F319$RAIN_FT))
+
+sum(is.na(rain_F319))
+# 0 missing values
+
+sum(is.na(rain2_F319))
+#0 missing values 
+
+rain2_F319$well <- "F-319"
+
+#######  G-561_T  #########
+input.fileG561T  <- "G-561_T.xlsx"
+rain_G561T <- read_excel("G-561_T.xlsx", sheet = "Rain")
+
+#Create date, time, and datetime variables
+rain_G561T$date <- substr(rain_G561T$Date, 1,10)
+rain_G561T$time  <- substr(rain_G561T$Date, 12,19)
+rain_G561T$datetime <- substr(rain_G561T$Date, 1, 13)
+
+rain_G561T$datetime <- paste(rain_G561T$datetime, ":00:00", sep="")
+
+rain2_G561T <- rain_G561T %>%
+  group_by(datetime)%>%
+  summarise(sum_rain=sum(rain_G561T$RAIN_FT))
+
+sum(is.na(rain_G561T))
+# 0 missing values
+
+sum(is.na(rain2_G561T))
+#0 missing values 
+
+rain2_G561T$well <- "G-561_T"
+
+#######  G-580A  #########
+input.fileG580A  <- "G-580A.xlsx"
+rain_G580A <- read_excel("G-580A.xlsx", sheet = "Rain")
+
+#Create date, time, and datetime variables
+rain_G580A$date <- substr(rain_G580A$Date, 1,10)
+rain_G580A$time  <- substr(rain_G580A$Date, 12,19)
+rain_G580A$datetime <- substr(rain_G580A$Date, 1, 13)
+
+rain_G580A$datetime <- paste(rain_G580A$datetime, ":00:00", sep="")
+
+rain2_G580A <- rain_G580A %>%
+  group_by(datetime)%>%
+  summarise(sum_rain=sum(rain_G580A$RAIN_FT))
+
+sum(is.na(rain_G580A))
+# 0 missing values
+
+sum(is.na(rain2_G580A))
+#0 missing values 
+
+rain2_G580A$well <- "G-580A"
+
+#######  G-852  #########
+input.fileG852  <- "G-852.xlsx"
+rain_G852 <- read_excel("G-852.xlsx", sheet = "Rain")
+
+#Create date, time, and datetime variables
+rain_G852$date <- substr(rain_G852$Date, 1,10)
+rain_G852$time  <- substr(rain_G852$Date, 12,19)
+rain_G852$datetime <- substr(rain_G852$Date, 1, 13)
+
+rain_G852$datetime <- paste(rain_G852$datetime, ":00:00", sep="")
+
+rain2_G852 <- rain_G852 %>%
+  group_by(datetime)%>%
+  summarise(sum_rain=sum(rain_G852$RAIN_FT))
+
+sum(is.na(rain_G852))
+# 0 missing values
+
+sum(is.na(rain2_G852))
+#0 missing values 
+
+rain2_G852$well <- "G-852"
+
+#######  G-860  #########
+input.fileG860  <- "G-860.xlsx"
+rain_G860 <- read_excel("G-860.xlsx", sheet = "Rain")
+
+#Create date, time, and datetime variables
+rain_G860$date <- substr(rain_G860$Date, 1,10)
+rain_G860$time  <- substr(rain_G860$Date, 12,19)
+rain_G860$datetime <- substr(rain_G860$Date, 1, 13)
+
+rain_G860$datetime <- paste(rain_G860$datetime, ":00:00", sep="")
+
+rain2_G860 <- rain_G860 %>%
+  group_by(datetime)%>%
+  summarise(sum_rain=sum(rain_G860$RAIN_FT))
+
+sum(is.na(rain_G860))
+# 0 missing values
+
+sum(is.na(rain2_G860))
+#0 missing values 
+
+rain2_G860$well <- "G-860"
+
+#######  G-1220_T  #########
+input.fileG1220T  <- "G-1220_T.xlsx"
+rain_G1220T <- read_excel("G-1220_T.xlsx", sheet = "Rain")
+
+#Create date, time, and datetime variables
+rain_G1220T$date <- substr(rain_G1220T$Date, 1,10)
+rain_G1220T$time  <- substr(rain_G1220T$Date, 12,19)
+rain_G1220T$datetime <- substr(rain_G1220T$Date, 1, 13)
+
+rain_G1220T$datetime <- paste(rain_G1220T$datetime, ":00:00", sep="")
+
+rain2_G1220T <- rain_G1220T %>%
+  group_by(datetime)%>%
+  summarise(sum_rain=sum(rain_G1220T$RAIN_FT))
+
+sum(is.na(rain_G1220T))
+# 0 missing values
+
+sum(is.na(rain2_G1220T))
+#0 missing values 
+
+rain2_G1220T$well <- "G-1220_T"
+
+#######  G-1260_T  #########
+input.fileG1260T  <- "G-1260_T.xlsx"
+rain_G1260T <- read_excel("G-1260_T.xlsx", sheet = "Rain")
+
+#Create date, time, and datetime variables
+rain_G1260T$date <- substr(rain_G1260T$Date, 1,10)
+rain_G1260T$time  <- substr(rain_G1260T$Date, 12,19)
+rain_G1260T$datetime <- substr(rain_G1260T$Date, 1, 13)
+
+rain_G1260T$datetime <- paste(rain_G1260T$datetime, ":00:00", sep="")
+
+rain2_G1260T <- rain_G1260T %>%
+  group_by(datetime)%>%
+  summarise(sum_rain=sum(rain_G1260T$RAIN_FT))
+
+sum(is.na(rain_G1260T))
+# 0 missing values
+
+sum(is.na(rain2_G1260T))
+#0 missing values 
+
+rain2_G1260T$well <- "G-1260_T"
+
+#######  G-2147_T  #########
+input.fileG2147T  <- "G-2147_T.xlsx"
+rain_G2147T <- read_excel("G-2147_T.xlsx", sheet = "Rain")
+
+#Create date, time, and datetime variables
+rain_G2147T$date <- substr(rain_G2147T$Date, 1,10)
+rain_G2147T$time  <- substr(rain_G2147T$Date, 12,19)
+rain_G2147T$datetime <- substr(rain_G2147T$Date, 1, 13)
+
+rain_G2147T$datetime <- paste(rain_G2147T$datetime, ":00:00", sep="")
+
+rain2_G2147T <- rain_G2147T %>%
+  group_by(datetime)%>%
+  summarise(sum_rain=sum(rain_G2147T$RAIN_FT))
+
+sum(is.na(rain_G2147T))
+# 0 missing values
+
+sum(is.na(rain2_G2147T))
+#0 missing values 
+
+rain2_G2147T$well <- "G-2147_T"
+
+#######  G-2866_T  #########
+input.fileG2866T  <- "G-2866_T.xlsx"
+rain_G2866T <- read_excel("G-2866_T.xlsx", sheet = "Rain")
+
+#Create date, time, and datetime variables
+rain_G2866T$date <- substr(rain_G2866T$Date, 1,10)
+rain_G2866T$time  <- substr(rain_G2866T$Date, 12,19)
+rain_G2866T$datetime <- substr(rain_G2866T$Date, 1, 13)
+
+rain_G2866T$datetime <- paste(rain_G2866T$datetime, ":00:00", sep="")
+
+rain2_G2866T <- rain_G2866T %>%
+  group_by(datetime)%>%
+  summarise(sum_rain=sum(rain_G2866T$RAIN_FT))
+
+sum(is.na(rain_G2866T))
+# 0 missing values
+
+sum(is.na(rain2_G2866T))
+#0 missing values 
+
+rain2_G2866T$well <- "G-2866_T"
+
+#######  G-3549  #########
+input.fileG3549  <- "G-3549.xlsx"
+rain_G3549 <- read_excel("G-3549.xlsx", sheet = "Rain")
+
+#Create date, time, and datetime variables
+rain_G3549$date <- substr(rain_G3549$Date, 1,10)
+rain_G3549$time  <- substr(rain_G3549$Date, 12,19)
+rain_G3549$datetime <- substr(rain_G3549$Date, 1, 13)
+
+rain_G3549$datetime <- paste(rain_G3549$datetime, ":00:00", sep="")
+
+rain2_G3549 <- rain_G3549 %>%
+  group_by(datetime)%>%
+  summarise(sum_rain=sum(rain_G3549$RAIN_FT))
+
+sum(is.na(rain_G3549))
+# 0 missing values
+
+sum(is.na(rain2_G3549))
+#0 missing values 
+
+rain2_G3549$well <- "G-3549"
+
+#####    Merge All Wells    ######
+all_rain <- smartbind(rain2_F179, rain2_F319, rain2_F45, rain2_G1220T, rain2_G1260T, rain2_G2147T, rain2_G2866T, rain2_G3549, rain2_G561T, rain2_G580A, rain2_G852, rain2_G860)
+all_rain$datetime <- as.POSIXlt(all_rain$datetime, '%Y-%m-%d %H:%M')
+all_rain$sum_rain <- as.numeric(all_rain$sum_rain)
+str(all_rain)

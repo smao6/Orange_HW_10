@@ -37,6 +37,7 @@ sum(is.na(rain2_F179))
 #0 missing values 
 
 rain2_F179$well <- "F-179"
+rain2_F179 <- as.data.frame(rain2_F179)
 
 #######  F-45  #########
 input.fileF45  <- "F-45.xlsx"
@@ -60,6 +61,7 @@ sum(is.na(rain2_F45))
 #0 missing values 
 
 rain2_F45$well <- "F-45"
+rain2_F45 <- as.data.frame(rain2_F45)
 
 #######  F-319  #########
 input.fileF319  <- "F-319.xlsx"
@@ -83,6 +85,7 @@ sum(is.na(rain2_F319))
 #0 missing values 
 
 rain2_F319$well <- "F-319"
+rain2_F319 <- as.data.frame(rain2_F319)
 
 #######  G-561_T  #########
 input.fileG561T  <- "G-561_T.xlsx"
@@ -106,6 +109,7 @@ sum(is.na(rain2_G561T))
 #0 missing values 
 
 rain2_G561T$well <- "G-561_T"
+rain2_G561T <- as.data.frame(rain2_G561T)
 
 #######  G-580A  #########
 input.fileG580A  <- "G-580A.xlsx"
@@ -129,6 +133,7 @@ sum(is.na(rain2_G580A))
 #0 missing values 
 
 rain2_G580A$well <- "G-580A"
+rain2_G580A <- as.data.frame(rain2_G580A)
 
 #######  G-852  #########
 input.fileG852  <- "G-852.xlsx"
@@ -152,6 +157,7 @@ sum(is.na(rain2_G852))
 #0 missing values 
 
 rain2_G852$well <- "G-852"
+rain2_G852 <- as.data.frame(rain2_G852)
 
 #######  G-860  #########
 input.fileG860  <- "G-860.xlsx"
@@ -175,6 +181,8 @@ sum(is.na(rain2_G860))
 #0 missing values 
 
 rain2_G860$well <- "G-860"
+rain2_G860 <- as.data.frame(rain2_G860)
+
 
 #######  G-1220_T  #########
 input.fileG1220T  <- "G-1220_T.xlsx"
@@ -198,6 +206,7 @@ sum(is.na(rain2_G1220T))
 #0 missing values 
 
 rain2_G1220T$well <- "G-1220_T"
+rain2_G1220T <- as.data.frame(rain2_G1220T)
 
 #######  G-1260_T  #########
 input.fileG1260T  <- "G-1260_T.xlsx"
@@ -221,6 +230,7 @@ sum(is.na(rain2_G1260T))
 #0 missing values 
 
 rain2_G1260T$well <- "G-1260_T"
+rain2_G1260T <- as.data.frame(rain2_G1260T)
 
 #######  G-2147_T  #########
 input.fileG2147T  <- "G-2147_T.xlsx"
@@ -244,6 +254,7 @@ sum(is.na(rain2_G2147T))
 #0 missing values 
 
 rain2_G2147T$well <- "G-2147_T"
+rain2_G2147T <- as.data.frame(rain2_G2147T)
 
 #######  G-2866_T  #########
 input.fileG2866T  <- "G-2866_T.xlsx"
@@ -267,6 +278,7 @@ sum(is.na(rain2_G2866T))
 #0 missing values 
 
 rain2_G2866T$well <- "G-2866_T"
+rain2_G2866T <- as.data.frame(rain2_G2866T)
 
 #######  G-3549  #########
 input.fileG3549  <- "G-3549.xlsx"
@@ -290,9 +302,13 @@ sum(is.na(rain2_G3549))
 #0 missing values 
 
 rain2_G3549$well <- "G-3549"
+rain2_G3549 <- as.data.frame(rain2_G3549)
 
 #####    Merge All Wells    ######
 all_rain <- smartbind(rain2_F179, rain2_F319, rain2_F45, rain2_G1220T, rain2_G1260T, rain2_G2147T, rain2_G2866T, rain2_G3549, rain2_G561T, rain2_G580A, rain2_G852, rain2_G860)
 all_rain$datetime <- as.POSIXlt(all_rain$datetime, '%Y-%m-%d %H:%M')
 all_rain$sum_rain <- as.numeric(all_rain$sum_rain)
 str(all_rain)
+
+#####      Export to CSV    ######
+write.csv(all_rain, file = "All_Rain.csv")

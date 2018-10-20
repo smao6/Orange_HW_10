@@ -1,0 +1,29 @@
+library(csvread)
+library(tm)
+library(tidyverse)
+library(tidytext)
+library(lubridate)
+library(stringr)
+library(httr)
+library(gtools)
+
+setwd('/Users/groves/Documents/Morgan/IAA/Fall 2/Text Analytics/')
+file.dir <- "/Users/groves/Documents/Morgan/IAA/Fall 2/Text Analytics/"
+alltweets<- read.csv("cleanning_all.csv", header = TRUE)
+alltweets1 <- as.data.frame(alltweets)
+alltweets2 <- iconv(alltweets1$body_clean, "ASCII", "UTF-8", sub="")
+alltweets3 <- Corpus(VectorSource(alltweets2))
+alltweets4 <- tm_map(alltweets3, removeWords, stopwords("english"))  
+alltweets5 <- tm_map(alltweets4, stripWhitespace)
+alltweets6 <- TermDocumentMatrix(alltweets5)
+
+library(tm)
+library(wordcloud)
+library(SnowballC)
+## try http:// if https:// URLs are not supported
+source("https://bioconductor.org/biocLite.R")
+biocLite("Rgraphviz")
+
+plot(alltweets6, term=findFreqTerms(alltweets6, lowfreq=5)[1:5], corThreshold=0.12, weighting=T,
+     attrs=list(node=list(label="foo", fillcolor="#66c2a4", fontsize="16", shape="ellipse"), edge=list(color="#cccccc"), graph=list(rankdir="LR")))
+

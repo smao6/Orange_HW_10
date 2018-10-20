@@ -1,0 +1,36 @@
+library(csvread)
+library(tm)
+library(tidyverse)
+library(tidytext)
+library(lubridate)
+library(stringr)
+library(httr)
+library(gtools)
+library(wordcloud)
+library(RColorBrewer)
+
+# Saving File Locations and Uploading CSV File #
+setwd('/Users/groves/Documents/Morgan/IAA/Fall 2/Text Analytics/')
+file.dir <- "/Users/groves/Documents/Morgan/IAA/Fall 2/Text Analytics/"
+cleandata <- read.csv("cleanning_all.csv", header = TRUE)
+cleandata2 <- iconv(cleandata$body_clean, "ASCII", "UTF-8", sub="")
+
+#extract text from the data frame build your own corpus(a corpus is a collection of text files)
+corpdata <- Corpus(VectorSource(cleandata2))
+
+# remove stopwords
+stopdata <- tm_map(corpdata, removeWords, stopwords("english"))  
+
+#build a term document matrix
+termmatrix <- TermDocumentMatrix(stopdata)
+datam <- as.matrix(termmatrix)
+datav <- sort(rowSums(datam),decreasing=TRUE)
+datadf <- data.frame(word = names(datav),freq=datav)
+View(datadf)
+
+#remove additional words: kardashian, kim, jenner, kendall, kylie, kris
+cleandata3 <- datadf[-c(1:3,8:10,72,85),]
+View(cleandata3)
+
+#draw the word cloud
+wordcloud(words = cleandata3$word, freq = cleandata3$freq, min.freq = 10,max.words=150, random.order=FALSE,scale = c(3, 0.5), colors = brewer.pal(8, "Dark2"))

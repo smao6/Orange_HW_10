@@ -1,0 +1,59 @@
+proc import datafile='\\vmware-host\Shared Folders\Desktop\MSA Fall\Fall 2\Time Series 2\correct_well_data.csv'
+	out=merge_well dbms=csv;
+run;
+
+data merged_3;
+	set merged_3;
+	if sum_rain>0.05 then rain_int=1;
+	else rain_int=0;
+	rain1=lag1(sum_rain);
+	rain2=lag2(sum_rain);
+	rain3=lag3(sum_rain);
+	rain4=lag4(sum_rain);
+	rain5=lag5(sum_rain);
+	rain6=lag6(sum_rain);
+	rain7=lag7(sum_rain);
+	rain8=lag8(sum_rain);
+	rain9=lag9(sum_rain);
+	rain10=lag10(sum_rain);
+	rain11=lag11(sum_rain);
+	rain12=lag12(sum_rain);
+	rain13=lag13(sum_rain);
+	rain14=lag14(sum_rain);
+	rain15=lag15(sum_rain);
+	rain16=lag16(sum_rain);
+	rain17=lag17(sum_rain);
+	rain18=lag18(sum_rain);
+	rain19=lag19(sum_rain);
+	rain20=lag20(sum_rain);
+	rain21=lag21(sum_rain);
+	rain22=lag22(sum_rain);
+	rain23=lag23(sum_rain);
+	rain24=lag24(sum_rain);
+run; 
+
+/*Model B*/
+proc arima data=merged_3;
+	identify var=avg_well(1, 2191) crosscorr=(rain5 rain7 rain10 rain12 rain14 rain17 rain19 rain21 rain22 rain24);
+	estimate input=(rain5 rain7 rain10 rain12 rain14 rain17 rain19 rain21 rain22 rain24) p=1 q=3 method=ML;
+	forecast lead=168 back=168 out=well_forecast_2 id=datetime interval=hour;
+run;
+quit;
+
+/*MAPE*/
+data well_forecast;
+	set well_forecast_2;
+	n+1;
+run;
+
+data test;
+	set well_forecast;
+	if n>26130;
+	error = avg_well - FORECAST;
+	abs_error=abs(RESIDUAL);
+	abs_err_obs=abs_error/abs(avg_well);
+run;
+
+proc means data=test;
+	var abs_error abs_err_obs;
+run; 
